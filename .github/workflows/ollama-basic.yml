@@ -42,3 +42,25 @@ jobs:
         RESPONSE=$(ollama run llama3.2:1b "Explain what DevOps means in one sentence, focusing on automation and collaboration.")
         echo "AI Response:"
         echo "$RESPONSE"
+    - name: Save AI response
+      run: |
+        mkdir -p outputs
+        TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
+        ollama run llama3.2:1b "Explain what DevOps means in one sentence, focusing on automation and collaboration." > "outputs/ai-response-$TIMESTAMP.txt"
+        echo "Response saved to outputs/ai-response-$TIMESTAMP.txt"
+        cat "outputs/ai-response-$TIMESTAMP.txt"
+    - name: Upload AI responses
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ai-responses-${{ github.run_number }}
+        path: outputs/
+        retention-days: 30 
+    - name: Advanced AI analysis
+      run: |
+        PROMPT="Analyze this GitHub Actions workflow and suggest three specific improvements for production use. Focus on security, performance, and maintainability."
+        echo "Advanced prompt: $PROMPT"
+        RESPONSE=$(ollama run llama3.2:1b "$PROMPT")
+        echo "AI Analysis:"
+        echo "$RESPONSE"
+        echo "$RESPONSE" > "outputs/workflow-analysis-$(date '+%Y-%m-%d_%H-%M-%S').txt"
